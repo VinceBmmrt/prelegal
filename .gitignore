@@ -90,3 +90,6 @@ docker-compose.override.yml
 .cache/
 tmp/
 temp/
+
+# ─── Claude Code ─────────────────────────────────────────────────────────────
+.claude/
