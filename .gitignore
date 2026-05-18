@@ -43,6 +43,9 @@ dmypy.json
 # Alembic migrations (keep versions folder, ignore compiled)
 *.pyc
 
+# Allow Next.js lib/ directory (root lib/ ignored above for Python)
+!frontend/lib/
+
 # ─── Next.js / Node ─────────────────────────────────────────────────────────
 node_modules/
 .next/
