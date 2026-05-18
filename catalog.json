@@ -62,5 +62,67 @@
       "description": "Addendum covering AI-specific terms for agreements involving artificial intelligence features, models, or services, addressing data usage, model training restrictions, and AI-related liability.",
       "filename": "AI-Addendum.md"
     }
+  ],
+  "templates_fr": [
+    {
+      "name": "Accord de Confidentialité Mutuel",
+      "description": "NDA mutuel standard couvrant les obligations réciproques de confidentialité entre deux parties, adapté pour le droit français (Code civil, loi n° 2018-670 du 30 juillet 2018 sur le secret des affaires).",
+      "filename": "fr/Accord-de-Confidentialite-Mutuel.md"
+    },
+    {
+      "name": "Accord de Confidentialité Mutuel – Page de Couverture",
+      "description": "Page de couverture de l'Accord de Confidentialité Mutuel. À compléter avec les informations des parties et les conditions commerciales ; incorpore les conditions générales par référence.",
+      "filename": "fr/Accord-de-Confidentialite-Mutuel-Page-de-Couverture.md"
+    },
+    {
+      "name": "Contrat de Service Cloud (CSC)",
+      "description": "Contrat standard pour la vente et l'achat de logiciels cloud et de produits SaaS, couvrant les conditions d'abonnement et les dispositions standard des services cloud, adapté pour le droit français.",
+      "filename": "fr/Contrat-de-Service-Cloud.md"
+    },
+    {
+      "name": "Accord sur les Niveaux de Service (ANS)",
+      "description": "Accord standard sur les niveaux de service conçu pour être utilisé avec le Contrat de Service Cloud, définissant les engagements de disponibilité et les remèdes en cas de non-respect.",
+      "filename": "fr/Accord-sur-les-Niveaux-de-Service.md"
+    },
+    {
+      "name": "Accord de Traitement des Données (ATD)",
+      "description": "Accord standard de traitement des données régissant le traitement des données personnelles, conforme au RGPD (Règlement (UE) 2016/679) et à la loi Informatique et Libertés.",
+      "filename": "fr/Accord-de-Traitement-des-Donnees.md"
+    },
+    {
+      "name": "Accord Partenaire Design",
+      "description": "Accord standard pour les partenariats design en phase précoce, permettant aux entreprises d'engager des partenaires design avant le lancement commercial complet d'un produit, adapté pour le droit français.",
+      "filename": "fr/Accord-Partenaire-Design.md"
+    },
+    {
+      "name": "Contrat de Services Professionnels (CSP)",
+      "description": "Contrat standard pour les prestations de services professionnels, couvrant les énoncés de travaux, livrables, conditions de paiement et propriété intellectuelle, adapté pour le droit français.",
+      "filename": "fr/Contrat-de-Services-Professionnels.md"
+    },
+    {
+      "name": "Accord de Partenariat",
+      "description": "Accord de partenariat standard pour les entreprises technologiques concluant des arrangements de partenariat commercial (référence, revendeur ou co-vente), adapté pour le droit français.",
+      "filename": "fr/Accord-de-Partenariat.md"
+    },
+    {
+      "name": "Accord de Confidentialité – Données de Santé",
+      "description": "Accord de sous-traitance standard pour les données de santé à caractère personnel, remplaçant les références HIPAA par le RGPD, la loi Informatique et Libertés, le Code de la santé publique, la CNIL et l'ANS.",
+      "filename": "fr/Accord-de-Confidentialite-Donnees-de-Sante.md"
+    },
+    {
+      "name": "Contrat de Licence Logiciel",
+      "description": "Contrat standard pour l'octroi de licences logicielles à des clients, couvrant les droits de licence, restrictions, conditions de support et formulaire de commande, adapté pour le droit français.",
+      "filename": "fr/Contrat-de-Licence-Logiciel.md"
+    },
+    {
+      "name": "Accord Pilote",
+      "description": "Accord à court terme permettant à un client potentiel d'évaluer un produit ou service avant de s'engager dans un contrat commercial complet, adapté pour le droit français (force majeure selon l'article 1218 du Code civil).",
+      "filename": "fr/Accord-Pilote.md"
+    },
+    {
+      "name": "Avenant Intelligence Artificielle",
+      "description": "Avenant couvrant les conditions spécifiques à l'IA pour les accords impliquant des fonctionnalités d'intelligence artificielle, abordant l'utilisation des données, les restrictions d'entraînement et la responsabilité liée à l'IA, adapté pour le droit français et le RGPD.",
+      "filename": "fr/Avenant-IA.md"
+    }
   ]
 }
