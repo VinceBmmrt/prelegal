@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[50479,["/_next/static/chunks/0dbhjjzl8qfwv.js","/_next/static/chunks/0gdyfwfk4x~5g.js"],"default"]
+3:I[97367,["/_next/static/chunks/0dbhjjzl8qfwv.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"flex flex-col h-screen","children":[["$","header",null,{"className":"flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4","children":[["$","h1",null,{"className":"text-xl font-semibold text-gray-900","children":"Générateur d'Accord de Confidentialité Mutuel"}],["$","p",null,{"className":"text-sm text-gray-500 mt-0.5","children":"Complétez le formulaire pour générer votre accord personnalisé"}]]}],["$","$L2",null,{}]]}],[["$","script","script-0",{"src":"/_next/static/chunks/0gdyfwfk4x~5g.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"77cmjQhb2VwUdYGeOkHNk"}
+5:null
