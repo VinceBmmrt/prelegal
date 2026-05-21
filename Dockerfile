@@ -4,6 +4,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
+ENV NEXT_OUTPUT=export
 RUN npm run build
 
 # Stage 2: Python backend + static files
