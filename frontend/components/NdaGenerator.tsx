@@ -1,9 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { defaultFormData, NdaFormData } from "@/lib/types";
 import ChatPanel from "./ChatPanel";
-import NdaPreview from "./NdaPreview";
+
+const NdaPreview = dynamic(() => import("./NdaPreview"), { ssr: false });
 
 export default function NdaGenerator() {
   const [formData, setFormData] = useState<NdaFormData>(defaultFormData);
@@ -15,8 +17,14 @@ export default function NdaGenerator() {
       const prevAny = prev as unknown as Record<string, unknown>;
       const next = { ...prevAny };
       for (const [key, val] of Object.entries(update)) {
-        if (val != null && typeof val === "object" && !Array.isArray(val)) {
-          next[key] = { ...(prevAny[key] as object), ...(val as object) };
+        if (val == null) continue;
+        if (typeof val === "object" && !Array.isArray(val)) {
+          const prev = (prevAny[key] as Record<string, unknown>) ?? {};
+          const merged: Record<string, unknown> = { ...prev };
+          for (const [k, v] of Object.entries(val as unknown as Record<string, unknown>)) {
+            if (v != null) merged[k] = v;
+          }
+          next[key] = merged;
         } else {
           next[key] = val;
         }

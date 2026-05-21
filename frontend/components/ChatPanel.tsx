@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { NdaFormData } from "@/lib/types";
 
 interface Message {
@@ -134,7 +135,13 @@ export default function ChatPanel({ formData, onFieldsUpdate }: Props) {
               }`}
               style={m.role === "user" ? { backgroundColor: "#032147" } : {}}
             >
-              {m.content || (
+              {m.content ? (
+                m.role === "assistant" ? (
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                ) : (
+                  m.content
+                )
+              ) : (
                 <span className="text-gray-400 italic animate-pulse">…</span>
               )}
             </div>

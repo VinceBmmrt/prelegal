@@ -45,7 +45,7 @@ scripts/stop-linux.sh
 scripts/start-windows.ps1
 scripts/stop-windows.ps1
 ```
-Backend available at http://localhost:8000
+Backend available at http://localhost:8080 on Windows (port 8000 is blocked by a Docker Desktop HNS proxy bug on this machine — start-windows.ps1 maps 8080:8000)
 
 ## Color Scheme
 - Accent Yellow: `#ecad0a`
@@ -56,3 +56,18 @@ Backend available at http://localhost:8000
 
 ## Implementation Status
 
+### PL-5: Foundation
+FastAPI backend + SQLite + JWT auth + static Next.js frontend served by FastAPI + Docker + start/stop scripts.
+
+### PL-6: AI Chat (Accord de Confidentialité Mutuel)
+- AI chat replaces the static form; streams SSE tokens via `POST /api/chat`
+- LiteLLM → OpenRouter → `openrouter/openai/gpt-oss-120b` with Cerebras provider
+- Two-phase: stream tokens first, then structured field extraction (`NdaFieldsPartial`)
+- `react-markdown` renders AI responses (bold, lists, etc.)
+- `NdaPreview` loaded with `next/dynamic ssr:false` to avoid hydration mismatch
+- Null guard in `handleFieldsUpdate` — AI returns null for unfilled fields, skip them
+
+## Known Issues / Gotchas
+- **Windows port**: Docker Desktop HNS proxy permanently blocks port 8000 on this machine. `start-windows.ps1` uses `8080:8000`. App runs at http://localhost:8080 on Windows.
+- **API key**: All start scripts pass `--env-file .env` to inject `OPENROUTER_API_KEY` at runtime (not baked into image).
+- **bcrypt**: Uses `bcrypt` directly (not passlib) — passlib 1.7.4 incompatible with bcrypt≥4.

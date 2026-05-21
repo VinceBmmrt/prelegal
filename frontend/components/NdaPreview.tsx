@@ -1,3 +1,5 @@
+"use client";
+
 import { NdaFormData } from "@/lib/types";
 
 const MONTHS_FR = [
@@ -11,8 +13,8 @@ function formatDate(dateStr: string): string {
   return `${parseInt(day)} ${MONTHS_FR[parseInt(month) - 1]} ${year}`;
 }
 
-function blank(value: string, fallback = "___________"): string {
-  return value.trim() || fallback;
+function blank(value: string | null | undefined, fallback = "___________"): string {
+  return (value ?? "").trim() || fallback;
 }
 
 interface Props {
