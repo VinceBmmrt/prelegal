@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 import auth
 import chat
+import documents
 from db import init_db
 
 STATIC_DIR = Path(__file__).parent.parent / "static"
@@ -21,6 +22,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(chat.router, prefix="/api", tags=["chat"])
+app.include_router(documents.router, prefix="/api", tags=["documents"])
 
 if STATIC_DIR.exists():
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

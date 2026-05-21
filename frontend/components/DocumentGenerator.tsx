@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { defaultFormData, NdaFormData } from "@/lib/types";
+import { authHeaders } from "@/lib/auth";
 import ChatPanel from "./ChatPanel";
 
 const NdaPreview = dynamic(() => import("./NdaPreview"), { ssr: false });
@@ -16,15 +17,25 @@ const ACNM_TYPE = "Accord-de-Confidentialite-Mutuel";
 interface Props {
   documentType: string;
   documentName: string;
+  initialFields?: Record<string, unknown>;
+  onBack: () => void;
 }
 
-export default function DocumentGenerator({ documentType, documentName }: Props) {
+export default function DocumentGenerator({
+  documentType,
+  documentName,
+  initialFields,
+  onBack,
+}: Props) {
   const [formData, setFormData] = useState<Record<string, unknown>>(
-    documentType === ACNM_TYPE
-      ? (defaultFormData as unknown as Record<string, unknown>)
-      : {}
+    initialFields ??
+      (documentType === ACNM_TYPE
+        ? (defaultFormData as unknown as Record<string, unknown>)
+        : {})
   );
   const [downloading, setDownloading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   function handleFieldsUpdate(update: Record<string, unknown>) {
@@ -45,6 +56,25 @@ export default function DocumentGenerator({ documentType, documentName }: Props)
       }
       return next;
     });
+    setSaved(false);
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await fetch("/api/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify({
+          document_type: documentType,
+          document_name: documentName,
+          fields: formData,
+        }),
+      });
+      setSaved(true);
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDownloadPdf() {
@@ -55,27 +85,23 @@ export default function DocumentGenerator({ documentType, documentName }: Props)
         import("jspdf"),
         import("html2canvas").then((m) => m.default),
       ]);
-
       const canvas = await html2canvas(previewRef.current, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
       });
-
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
       const imgH = (canvas.height * pageW) / canvas.width;
-
       let y = 0;
       while (y < imgH) {
         if (y > 0) pdf.addPage();
         pdf.addImage(imgData, "PNG", 0, -y, pageW, imgH);
         y += pageH;
       }
-
       const slug = documentName
         .toLowerCase()
         .normalize("NFD")
@@ -90,15 +116,25 @@ export default function DocumentGenerator({ documentType, documentName }: Props)
   }
 
   return (
-    <div className="flex h-[calc(100vh-65px)]">
+    <div className="flex h-full">
       {/* Chat panel */}
-      <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
-        <ChatPanel
-          formData={formData}
-          onFieldsUpdate={handleFieldsUpdate}
-          documentType={documentType}
-        />
-        <div className="flex-shrink-0 px-4 pb-4">
+      <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0">
+          <ChatPanel
+            formData={formData}
+            onFieldsUpdate={handleFieldsUpdate}
+            documentType={documentType}
+          />
+        </div>
+        <div className="flex-shrink-0 px-4 pb-4 space-y-2">
+          <button
+            onClick={handleSave}
+            disabled={saving || saved}
+            className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            style={{ backgroundColor: saved ? "#22c55e" : "#753991" }}
+          >
+            {saving ? "Sauvegarde…" : saved ? "✓ Sauvegardé" : "Sauvegarder"}
+          </button>
           <button
             onClick={handleDownloadPdf}
             disabled={downloading}

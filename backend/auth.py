@@ -4,12 +4,14 @@ from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
-from jose import jwt
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 
 from db import get_db
 
 router = APIRouter()
+_bearer = HTTPBearer()
 
 
 def _hash(password: str) -> str:
@@ -40,6 +42,27 @@ def _make_token(user_id: int) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(hours=TOKEN_EXPIRE_HOURS),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(_bearer),
+    db: sqlite3.Connection = Depends(get_db),
+) -> dict:
+    """Decode JWT and return the user row. Raises 401 on any failure."""
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload["sub"])
+    except (JWTError, ValueError):
+        raise HTTPException(status_code=401, detail="Token invalide ou expiré")
+    row = db.execute("SELECT id, email FROM users WHERE id = ?", (user_id,)).fetchone()
+    if not row:
+        raise HTTPException(status_code=401, detail="Utilisateur introuvable")
+    return dict(row)
+
+
+@router.get("/me")
+def me(user: dict = Depends(get_current_user)):
+    return {"id": user["id"], "email": user["email"]}
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)

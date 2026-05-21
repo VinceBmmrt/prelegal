@@ -57,6 +57,13 @@ Derived from `catalog.json` filename: `docTypeKey("fr/Accord-de-Confidentialite-
 
 Field state is `Record<string, unknown>` — deep-merged on each AI response.
 
+## Auth & persistence
+
+- **Token storage**: `localStorage` key `prelegal_token`; `frontend/lib/auth.ts` exports `getToken`, `setToken`, `clearToken`, `authHeaders`
+- **AuthContext**: `frontend/contexts/AuthContext.tsx` — verifies token via `GET /api/auth/me` on mount; provides `user`, `loading`, `login`, `signup`, `logout`
+- **Protected routes**: `app/page.tsx` redirects to `/auth/signin` if not authenticated
+- **Document persistence**: `backend/documents.py` — `POST /api/documents`, `GET /api/documents`, `DELETE /api/documents/{id}`; stored in SQLite `documents` table (fields as JSON string); resets on container restart
+
 ## Implementation Status
 
 ### What is built
@@ -65,12 +72,12 @@ Field state is `Record<string, unknown>` — deep-merged on each AI response.
 - **AI chat**: `ChatPanel` streams SSE tokens from `POST /api/chat`, then receives structured fields — live-updates the preview
 - **ACNM preview**: `NdaPreview` renders the full NDA with filled fields; PDF download via jsPDF + html2canvas
 - **Generic preview**: `GenericDocumentPreview` shows a field-summary card for non-ACNM documents
-- **Unsupported document handling**: each AI system prompt explains which documents are available and offers alternatives when the user asks for something else
-- **Auth endpoints** (backend only, no UI yet): `POST /api/auth/signup` → 201 + JWT, `POST /api/auth/signin` → 200 + JWT
-- **No document persistence** — fields live in React state only, reset on page reload
+- **AI disclaimer**: both preview components show "Ce document est un projet de rédaction produit par IA…" at the bottom
+- **Auth UI**: `/auth/signin` and `/auth/signup` pages with email/password forms; protected routes redirect unauthenticated users
+- **App header**: `AppHeader` shows branding + logged-in user email + logout button
+- **Home view**: `HomeView` shows hero CTA + saved documents grid (fetched from API); delete button on hover
+- **Document persistence**: save button in `DocumentGenerator` posts to `/api/documents`; saved documents appear on home and can be re-opened
+- **User sessions / protected routes**: JWT in localStorage, AuthContext verifies on mount
 
 ### What is NOT built yet
-- Auth UI (sign in / sign up screens)
-- Document persistence (save/load drafts)
-- Full JSX previews for the 11 non-ACNM document types (they use the generic field summary)
-- User sessions / protected routes
+- Full JSX previews for the 11 non-ACNM document types (they use the generic field summary card)
