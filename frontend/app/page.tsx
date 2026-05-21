@@ -73,7 +73,7 @@ export default function Page() {
       {view === "create" && activeDoc && (
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Document sub-header */}
-          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-4">
+          <div data-noprint className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-4">
             <button
               onClick={() => setView("home")}
               className="text-sm font-medium hover:opacity-70 transition-opacity flex-shrink-0"
@@ -94,7 +94,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 min-h-0">
             <DocumentGenerator
               documentType={activeDoc.documentType}
               documentName={activeDoc.documentName}

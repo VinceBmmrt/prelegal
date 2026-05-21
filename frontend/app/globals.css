@@ -18,3 +18,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   color-scheme: only light;
 }
+
+@media print {
+  header, aside, [data-noprint] { display: none !important; }
+
+  html, body, .h-screen { height: auto !important; overflow: visible !important; }
+
+  .flex-1, .min-h-0, .overflow-hidden, .overflow-y-auto {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    flex: none !important;
+  }
+
+  .bg-gray-100 { background: white !important; padding: 0 !important; }
+}

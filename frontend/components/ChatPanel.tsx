@@ -19,7 +19,7 @@ export default function ChatPanel({ formData, onFieldsUpdate, documentType }: Pr
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -30,7 +30,11 @@ export default function ChatPanel({ formData, onFieldsUpdate, documentType }: Pr
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const hasUserMessages = messages.some((m) => m.role === "user");
+    if (hasUserMessages && scrollContainerRef.current) {
+      const el = scrollContainerRef.current;
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages]);
 
   async function sendToBackend(history: Message[]) {
@@ -122,7 +126,7 @@ export default function ChatPanel({ formData, onFieldsUpdate, documentType }: Pr
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Messages */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-3">
+      <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-3">
         {messages.map((m) => (
           <div
             key={m.id}
@@ -148,7 +152,6 @@ export default function ChatPanel({ formData, onFieldsUpdate, documentType }: Pr
             </div>
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
 
       {/* Input */}

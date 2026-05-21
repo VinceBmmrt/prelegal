@@ -19,10 +19,9 @@ function blank(value: string | null | undefined, fallback = "___________"): stri
 
 interface Props {
   formData: NdaFormData;
-  ref: React.Ref<HTMLDivElement>;
 }
 
-export default function NdaPreview({ formData, ref }: Props) {
+export default function NdaPreview({ formData }: Props) {
   const {
     objet,
     dateEntreeEnVigueur,
@@ -37,7 +36,6 @@ export default function NdaPreview({ formData, ref }: Props) {
 
   return (
     <div
-      ref={ref}
       className="bg-white font-serif text-sm leading-relaxed text-gray-900 p-12 max-w-3xl mx-auto"
       style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
     >
