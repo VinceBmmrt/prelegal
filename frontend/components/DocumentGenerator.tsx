@@ -6,22 +6,36 @@ import { defaultFormData, NdaFormData } from "@/lib/types";
 import ChatPanel from "./ChatPanel";
 
 const NdaPreview = dynamic(() => import("./NdaPreview"), { ssr: false });
+const GenericDocumentPreview = dynamic(
+  () => import("./GenericDocumentPreview"),
+  { ssr: false }
+);
 
-export default function NdaGenerator() {
-  const [formData, setFormData] = useState<NdaFormData>(defaultFormData);
+const ACNM_TYPE = "Accord-de-Confidentialite-Mutuel";
+
+interface Props {
+  documentType: string;
+  documentName: string;
+}
+
+export default function DocumentGenerator({ documentType, documentName }: Props) {
+  const [formData, setFormData] = useState<Record<string, unknown>>(
+    documentType === ACNM_TYPE
+      ? (defaultFormData as unknown as Record<string, unknown>)
+      : {}
+  );
   const [downloading, setDownloading] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  function handleFieldsUpdate(update: Partial<NdaFormData>) {
+  function handleFieldsUpdate(update: Record<string, unknown>) {
     setFormData((prev) => {
-      const prevAny = prev as unknown as Record<string, unknown>;
-      const next = { ...prevAny };
+      const next = { ...prev };
       for (const [key, val] of Object.entries(update)) {
         if (val == null) continue;
         if (typeof val === "object" && !Array.isArray(val)) {
-          const prev = (prevAny[key] as Record<string, unknown>) ?? {};
-          const merged: Record<string, unknown> = { ...prev };
-          for (const [k, v] of Object.entries(val as unknown as Record<string, unknown>)) {
+          const prevVal = (prev[key] as Record<string, unknown>) ?? {};
+          const merged: Record<string, unknown> = { ...prevVal };
+          for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
             if (v != null) merged[k] = v;
           }
           next[key] = merged;
@@ -29,7 +43,7 @@ export default function NdaGenerator() {
           next[key] = val;
         }
       }
-      return next as unknown as NdaFormData;
+      return next;
     });
   }
 
@@ -62,7 +76,14 @@ export default function NdaGenerator() {
         y += pageH;
       }
 
-      pdf.save("accord-de-confidentialite-mutuel.pdf");
+      const slug = documentName
+        .toLowerCase()
+        .normalize("NFD")
+        // eslint-disable-next-line no-misleading-character-class
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+      pdf.save(`${slug}.pdf`);
     } finally {
       setDownloading(false);
     }
@@ -72,7 +93,11 @@ export default function NdaGenerator() {
     <div className="flex h-[calc(100vh-65px)]">
       {/* Chat panel */}
       <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
-        <ChatPanel formData={formData} onFieldsUpdate={handleFieldsUpdate} />
+        <ChatPanel
+          formData={formData}
+          onFieldsUpdate={handleFieldsUpdate}
+          documentType={documentType}
+        />
         <div className="flex-shrink-0 px-4 pb-4">
           <button
             onClick={handleDownloadPdf}
@@ -87,7 +112,18 @@ export default function NdaGenerator() {
 
       {/* Preview panel */}
       <div className="flex-1 overflow-y-auto bg-gray-100 p-8">
-        <NdaPreview formData={formData} ref={previewRef} />
+        {documentType === ACNM_TYPE ? (
+          <NdaPreview
+            formData={formData as unknown as NdaFormData}
+            ref={previewRef}
+          />
+        ) : (
+          <GenericDocumentPreview
+            fields={formData}
+            documentName={documentName}
+            ref={previewRef}
+          />
+        )}
       </div>
     </div>
   );
