@@ -1,0 +1,19 @@
+.git
+.claude
+.env
+.env.*
+
+# Python
+backend/.venv
+backend/__pycache__
+backend/*.pyc
+backend/prelegal.db
+
+# Next.js
+frontend/node_modules
+frontend/.next
+frontend/out
+
+# Misc
+*.log
+static/
