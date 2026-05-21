@@ -2,13 +2,28 @@
 
 import { useRef, useState } from "react";
 import { defaultFormData, NdaFormData } from "@/lib/types";
-import NdaForm from "./NdaForm";
+import ChatPanel from "./ChatPanel";
 import NdaPreview from "./NdaPreview";
 
 export default function NdaGenerator() {
   const [formData, setFormData] = useState<NdaFormData>(defaultFormData);
   const [downloading, setDownloading] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  function handleFieldsUpdate(update: Partial<NdaFormData>) {
+    setFormData((prev) => {
+      const prevAny = prev as unknown as Record<string, unknown>;
+      const next = { ...prevAny };
+      for (const [key, val] of Object.entries(update)) {
+        if (val != null && typeof val === "object" && !Array.isArray(val)) {
+          next[key] = { ...(prevAny[key] as object), ...(val as object) };
+        } else {
+          next[key] = val;
+        }
+      }
+      return next as unknown as NdaFormData;
+    });
+  }
 
   async function handleDownloadPdf() {
     if (!previewRef.current) return;
@@ -47,14 +62,15 @@ export default function NdaGenerator() {
 
   return (
     <div className="flex h-[calc(100vh-65px)]">
-      {/* Form panel */}
-      <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
-        <div className="p-6 space-y-6">
-          <NdaForm formData={formData} onChange={setFormData} />
+      {/* Chat panel */}
+      <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
+        <ChatPanel formData={formData} onFieldsUpdate={handleFieldsUpdate} />
+        <div className="flex-shrink-0 px-4 pb-4">
           <button
             onClick={handleDownloadPdf}
             disabled={downloading}
-            className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            style={{ backgroundColor: "#209dd7" }}
           >
             {downloading ? "Génération en cours…" : "Télécharger en PDF"}
           </button>
