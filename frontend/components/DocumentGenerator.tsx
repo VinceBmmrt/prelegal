@@ -118,12 +118,14 @@ export default function DocumentGenerator({
   return (
     <div className="flex h-full">
       {/* Chat panel */}
-      <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
-        <ChatPanel
-          formData={formData}
-          onFieldsUpdate={handleFieldsUpdate}
-          documentType={documentType}
-        />
+      <aside className="w-96 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0">
+          <ChatPanel
+            formData={formData}
+            onFieldsUpdate={handleFieldsUpdate}
+            documentType={documentType}
+          />
+        </div>
         <div className="flex-shrink-0 px-4 pb-4 space-y-2">
           <button
             onClick={handleSave}
