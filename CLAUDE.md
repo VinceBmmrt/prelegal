@@ -42,18 +42,35 @@ scripts/start-windows.ps1 scripts/stop-windows.ps1
 - Dark Navy: `#032147` (headings)
 - Gray Text: `#888888`
 
+## Multi-document architecture
+
+### Document type key
+Derived from `catalog.json` filename: `docTypeKey("fr/Accord-de-Confidentialite-Mutuel.md")` → `"Accord-de-Confidentialite-Mutuel"`. Frontend sends this as `document_type` in every `/api/chat` request.
+
+### Backend registry (`backend/chat.py`)
+`DOC_REGISTRY` maps each doc type key to `{name, model, system_prompt, constraints}`. The endpoint dispatches to the correct Pydantic model and system prompt automatically. Adding a new document type = add one entry to `DOC_REGISTRY` + one Pydantic model.
+
+### Frontend document flow
+`DocumentSelector` (selection grid) → `DocumentGenerator` (owns field state) → conditionally renders:
+- `NdaPreview` for ACNM (full JSX document preview)
+- `GenericDocumentPreview` for all other docs (field summary card)
+
+Field state is `Record<string, unknown>` — deep-merged on each AI response.
+
 ## Implementation Status
 
 ### What is built
-- **One document only**: Accord de Confidentialité Mutuel (French NDA)
-- **AI chat**: `ChatPanel` streams SSE tokens from `POST /api/chat`, then receives structured `NdaFieldsPartial` fields — live-updates the preview
-- **NDA preview**: `NdaPreview` renders the full document with filled fields; PDF download via jsPDF + html2canvas
+- **All 12 French document types** from `catalog.json/templates_fr` — each with a tailored AI system prompt and Pydantic field model
+- **Document selection screen**: grid of 12 document cards; selecting one opens the chat/preview layout
+- **AI chat**: `ChatPanel` streams SSE tokens from `POST /api/chat`, then receives structured fields — live-updates the preview
+- **ACNM preview**: `NdaPreview` renders the full NDA with filled fields; PDF download via jsPDF + html2canvas
+- **Generic preview**: `GenericDocumentPreview` shows a field-summary card for non-ACNM documents
+- **Unsupported document handling**: each AI system prompt explains which documents are available and offers alternatives when the user asks for something else
 - **Auth endpoints** (backend only, no UI yet): `POST /api/auth/signup` → 201 + JWT, `POST /api/auth/signin` → 200 + JWT
 - **No document persistence** — fields live in React state only, reset on page reload
-- **No document selection UI** — catalog.json templates exist but only ACNM is wired up
 
 ### What is NOT built yet
 - Auth UI (sign in / sign up screens)
 - Document persistence (save/load drafts)
-- Multi-document support (only ACNM today)
+- Full JSX previews for the 11 non-ACNM document types (they use the generic field summary)
 - User sessions / protected routes

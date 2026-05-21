@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Générateur d'Accord de Confidentialité Mutuel",
-  description: "Créez votre accord de confidentialité mutuel personnalisé",
+  title: "Prelegal – Documents juridiques français",
+  description: "Rédigez vos documents juridiques professionnels en français grâce à l'IA",
 };
 
 export default function RootLayout({

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { NdaFormData } from "@/lib/types";
 
 interface Message {
   id: string;
@@ -11,11 +10,12 @@ interface Message {
 }
 
 interface Props {
-  formData: NdaFormData;
-  onFieldsUpdate: (fields: Partial<NdaFormData>) => void;
+  formData: Record<string, unknown>;
+  onFieldsUpdate: (fields: Record<string, unknown>) => void;
+  documentType: string;
 }
 
-export default function ChatPanel({ formData, onFieldsUpdate }: Props) {
+export default function ChatPanel({ formData, onFieldsUpdate, documentType }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,6 +48,7 @@ export default function ChatPanel({ formData, onFieldsUpdate }: Props) {
         body: JSON.stringify({
           messages: history.map(({ role, content }) => ({ role, content })),
           current_fields: formData,
+          document_type: documentType,
         }),
       });
 
@@ -92,10 +93,10 @@ export default function ChatPanel({ formData, onFieldsUpdate }: Props) {
   }
 
   function applyFieldUpdate(fields: Record<string, unknown>) {
-    const update: Partial<NdaFormData> = {};
+    const update: Record<string, unknown> = {};
     for (const [key, val] of Object.entries(fields)) {
       if (val == null) continue;
-      (update as Record<string, unknown>)[key] = val;
+      update[key] = val;
     }
     if (Object.keys(update).length > 0) {
       onFieldsUpdate(update);
