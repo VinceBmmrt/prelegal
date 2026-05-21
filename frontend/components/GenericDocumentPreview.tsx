@@ -1,59 +1,52 @@
 "use client";
 
-import { forwardRef } from "react";
-
 interface Props {
   fields: Record<string, unknown>;
   documentName: string;
 }
 
-const GenericDocumentPreview = forwardRef<HTMLDivElement, Props>(
-  ({ fields, documentName }, ref) => {
-    const entries = Object.entries(fields).filter(
-      ([, v]) => v != null && v !== ""
-    );
+export default function GenericDocumentPreview({ fields, documentName }: Props) {
+  const entries = Object.entries(fields).filter(
+    ([, v]) => v != null && v !== ""
+  );
 
-    return (
-      <div ref={ref} className="bg-white rounded-xl shadow-sm p-8 max-w-2xl mx-auto">
-        <h1
-          className="text-xl font-bold mb-6 pb-4 border-b border-gray-200"
-          style={{ color: "#032147" }}
-        >
-          {documentName}
-        </h1>
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-8 max-w-2xl mx-auto">
+      <h1
+        className="text-xl font-bold mb-6 pb-4 border-b border-gray-200"
+        style={{ color: "#032147" }}
+      >
+        {documentName}
+      </h1>
 
-        {entries.length === 0 ? (
-          <p className="text-sm italic" style={{ color: "#888888" }}>
-            Commencez la conversation pour remplir les champs du document.
-          </p>
-        ) : (
-          <dl className="space-y-4">
-            {entries.map(([key, value]) => (
-              <div key={key} className="border-b border-gray-100 pb-3 last:border-0">
-                <dt
-                  className="text-xs font-semibold uppercase tracking-wide mb-1"
-                  style={{ color: "#888888" }}
-                >
-                  {formatLabel(key)}
-                </dt>
-                <dd className="text-sm text-gray-800">
-                  {typeof value === "object" && value !== null
-                    ? renderNested(value as Record<string, unknown>)
-                    : String(value)}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
+      {entries.length === 0 ? (
+        <p className="text-sm italic" style={{ color: "#888888" }}>
+          Commencez la conversation pour remplir les champs du document.
+        </p>
+      ) : (
+        <dl className="space-y-4">
+          {entries.map(([key, value]) => (
+            <div key={key} className="border-b border-gray-100 pb-3 last:border-0">
+              <dt
+                className="text-xs font-semibold uppercase tracking-wide mb-1"
+                style={{ color: "#888888" }}
+              >
+                {formatLabel(key)}
+              </dt>
+              <dd className="text-sm text-gray-800">
+                {typeof value === "object" && value !== null
+                  ? renderNested(value as Record<string, unknown>)
+                  : String(value)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
-        <Disclaimer />
-      </div>
-    );
-  }
-);
-
-GenericDocumentPreview.displayName = "GenericDocumentPreview";
-export default GenericDocumentPreview;
+      <Disclaimer />
+    </div>
+  );
+}
 
 function Disclaimer() {
   return (
