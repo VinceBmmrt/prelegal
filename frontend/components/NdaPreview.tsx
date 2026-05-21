@@ -344,6 +344,11 @@ export default function NdaPreview({ formData, ref }: Props) {
         </a>{" "}
         libre d&lsquo;utilisation sous CC BY 4.0. Adapté pour le droit français.
       </p>
+
+      <p className="text-xs italic text-gray-400 mt-4 pt-4 border-t border-gray-200 text-center">
+        Ce document est un projet de rédaction produit par IA. Il doit être soumis à la révision
+        d&lsquo;un professionnel du droit avant toute utilisation.
+      </p>
     </div>
   );
 }

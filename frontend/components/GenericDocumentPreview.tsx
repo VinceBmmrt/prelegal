@@ -45,6 +45,8 @@ const GenericDocumentPreview = forwardRef<HTMLDivElement, Props>(
             ))}
           </dl>
         )}
+
+        <Disclaimer />
       </div>
     );
   }
@@ -52,6 +54,15 @@ const GenericDocumentPreview = forwardRef<HTMLDivElement, Props>(
 
 GenericDocumentPreview.displayName = "GenericDocumentPreview";
 export default GenericDocumentPreview;
+
+function Disclaimer() {
+  return (
+    <p className="mt-8 pt-4 border-t border-gray-200 text-xs italic text-gray-400 text-center">
+      Ce document est un projet de rédaction produit par IA. Il doit être soumis à la révision
+      d&apos;un professionnel du droit avant toute utilisation.
+    </p>
+  );
+}
 
 function formatLabel(key: string): string {
   return key
