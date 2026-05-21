@@ -2,13 +2,7 @@
 
 ## Overview
 
-This is a SaaS product to allow users to draft legal agreements based on templates in the templates directory.
-The user can carry out AI chat in order to establish what document they want and how to fill in the fields.
-The available documents are covered in the catalog.json file in the project root, included here:
-
-@catalog.json
-
-The current implementation supports all 11 document types via AI chat with full user authentication and document persistence.
+SaaS product to draft legal agreements via AI chat. The user chats with an AI assistant which fills in the document fields live. Available documents are in `catalog.json`.
 
 ## Development process
 
@@ -20,32 +14,26 @@ When instructed to build a feature:
 
 ## AI design
 
-When writing code to make calls to LLMs, use your Cerebras skill to use LiteLLM via OpenRouter to the `openrouter/openai/gpt-oss-120b` model with Cerebras as the inference provider. You should use Structured Outputs so that you can interpret the results and populate fields in the legal document.
+Use LiteLLM via OpenRouter to `openrouter/openai/gpt-oss-120b` with Cerebras as inference provider. Use Structured Outputs to extract and populate document fields.
 
-There is an OPENROUTER_API_KEY in the .env file in the project root.
+`OPENROUTER_API_KEY` is in `.env` at project root (never baked into Docker image — passed at runtime via `--env-file .env`).
 
 ## Technical design
 
-The entire project should be packaged into a Docker container.  
-The backend should be in backend/ and be a uv project, using FastAPI.  
-The frontend should be in frontend/  
-The database should use SQLLite and be created from scratch each time the Docker container is brought up, allowing for a users table with sign up and sign in.  
-Consider statically building the frontend and serving it via FastAPI, if that will work.  
-There should be scripts in scripts/ for:  
-```bash
-# Mac
-scripts/start-mac.sh    # Start
-scripts/stop-mac.sh     # Stop
+- **Backend**: `backend/` — FastAPI, uv project (`package = false`), SQLite (fresh per container start)
+- **Frontend**: `frontend/` — Next.js 16, statically exported (`NEXT_OUTPUT=export`), served by FastAPI
+- **Auth**: `bcrypt` directly (not passlib — incompatible with bcrypt≥4), `python-jose` JWT, 24h expiry
+- **Docker**: multi-stage build — Node builds frontend to `out/`, Python/uv serves backend + static files
 
-# Linux
-scripts/start-linux.sh
-scripts/stop-linux.sh
-
-# Windows
-scripts/start-windows.ps1
-scripts/stop-windows.ps1
+### Start/stop scripts
 ```
-Backend available at http://localhost:8080 on Windows (port 8000 is blocked by a Docker Desktop HNS proxy bug on this machine — start-windows.ps1 maps 8080:8000)
+scripts/start-mac.sh      scripts/stop-mac.sh
+scripts/start-linux.sh    scripts/stop-linux.sh
+scripts/start-windows.ps1 scripts/stop-windows.ps1
+```
+
+**Mac/Linux**: http://localhost:8000  
+**Windows**: http://localhost:8080 — Docker Desktop HNS proxy blocks port 8000 on this machine; `start-windows.ps1` maps `8080:8000`
 
 ## Color Scheme
 - Accent Yellow: `#ecad0a`
@@ -56,18 +44,16 @@ Backend available at http://localhost:8080 on Windows (port 8000 is blocked by a
 
 ## Implementation Status
 
-### PL-5: Foundation
-FastAPI backend + SQLite + JWT auth + static Next.js frontend served by FastAPI + Docker + start/stop scripts.
+### What is built
+- **One document only**: Accord de Confidentialité Mutuel (French NDA)
+- **AI chat**: `ChatPanel` streams SSE tokens from `POST /api/chat`, then receives structured `NdaFieldsPartial` fields — live-updates the preview
+- **NDA preview**: `NdaPreview` renders the full document with filled fields; PDF download via jsPDF + html2canvas
+- **Auth endpoints** (backend only, no UI yet): `POST /api/auth/signup` → 201 + JWT, `POST /api/auth/signin` → 200 + JWT
+- **No document persistence** — fields live in React state only, reset on page reload
+- **No document selection UI** — catalog.json templates exist but only ACNM is wired up
 
-### PL-6: AI Chat (Accord de Confidentialité Mutuel)
-- AI chat replaces the static form; streams SSE tokens via `POST /api/chat`
-- LiteLLM → OpenRouter → `openrouter/openai/gpt-oss-120b` with Cerebras provider
-- Two-phase: stream tokens first, then structured field extraction (`NdaFieldsPartial`)
-- `react-markdown` renders AI responses (bold, lists, etc.)
-- `NdaPreview` loaded with `next/dynamic ssr:false` to avoid hydration mismatch
-- Null guard in `handleFieldsUpdate` — AI returns null for unfilled fields, skip them
-
-## Known Issues / Gotchas
-- **Windows port**: Docker Desktop HNS proxy permanently blocks port 8000 on this machine. `start-windows.ps1` uses `8080:8000`. App runs at http://localhost:8080 on Windows.
-- **API key**: All start scripts pass `--env-file .env` to inject `OPENROUTER_API_KEY` at runtime (not baked into image).
-- **bcrypt**: Uses `bcrypt` directly (not passlib) — passlib 1.7.4 incompatible with bcrypt≥4.
+### What is NOT built yet
+- Auth UI (sign in / sign up screens)
+- Document persistence (save/load drafts)
+- Multi-document support (only ACNM today)
+- User sessions / protected routes
